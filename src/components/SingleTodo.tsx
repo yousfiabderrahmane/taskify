@@ -42,7 +42,7 @@ export const SingleTodo: React.FC<Props> = ({ todo, todos, setTodos }) => {
     setTodos(editedTodos);
     setIsEditing(false);
     if (!editTodo) {
-      handleDelete(todo.id);
+      handleDelete(id);
     }
   };
 
@@ -71,7 +71,7 @@ export const SingleTodo: React.FC<Props> = ({ todo, todos, setTodos }) => {
       )}
 
       <div>
-        {!todo.isDone && (
+        {!todo.isDone && !isEditing && (
           <span
             className="icon"
             onClick={() => {
@@ -81,18 +81,19 @@ export const SingleTodo: React.FC<Props> = ({ todo, todos, setTodos }) => {
             <AiFillEdit />
           </span>
         )}
-
         <span className="icon" onClick={() => handleDelete(todo.id)}>
           <AiFillDelete />
         </span>
-        <span
-          className="icon"
-          onClick={() => {
-            handleDone(todo.id);
-          }}
-        >
-          <MdOutlineDownloadDone />
-        </span>
+        {!isEditing && (
+          <span
+            className="icon"
+            onClick={() => {
+              handleDone(todo.id);
+            }}
+          >
+            <MdOutlineDownloadDone />
+          </span>
+        )}
       </div>
     </form>
   );
