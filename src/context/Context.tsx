@@ -5,6 +5,7 @@ interface Todo {
   id: number;
   todo: string;
   isDone: boolean;
+  isEditing: boolean;
 }
 
 //initial state
@@ -18,7 +19,6 @@ const initialState = {
 interface InitialState {
   todo: string; //task
   todos: Todo[]; //lista dyal les task
-  isEditing: boolean;
   editedTodo: string;
 }
 
@@ -26,9 +26,6 @@ interface InitialState {
 export enum ActionType {
   UPDATE_TODO = "UPDATE_TODO", //the task name state
   UPDATE_LIST = "UPDATE_LIST", //the array
-  EDIT = "EDIT", //handle the edit
-  DONE = "DONE", //handle the done
-  DELETE = "DELETE", //handle the delete
   EDITING = "EDITING", //to determine wheter editing ot not
   EDITED_TODO = "EDITED_TODO", //state of the edited todo task name
 }
@@ -86,6 +83,7 @@ export const useTodosManager = () => {
           id: Math.random() * 70,
           todo: state.todo,
           isDone: false,
+          isEditing: false,
         },
       ];
 
@@ -100,7 +98,7 @@ export const useTodosManager = () => {
   //handle check
   const handleDone = (id: number) => {
     const newList = state.todos.map((todo) =>
-      todo.id === id ? { ...todo, isDone: true } : todo
+      todo.id === id ? { ...todo, isDone: !todo.isDone } : todo
     );
     dispatch({ type: ActionType.UPDATE_LIST, payload: newList });
   };
@@ -124,11 +122,11 @@ export const useTodosManager = () => {
     });
 
     dispatch({ type: ActionType.UPDATE_LIST, payload: newList });
-    dispatch({ type: ActionType.EDITING, payload: false });
     if (!state.editedTodo) {
       handleDelete(id);
     }
   };
+
   return {
     ...state,
     handleAdd,

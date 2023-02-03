@@ -3,16 +3,9 @@ import { useTodos } from "../context/Context";
 import "./styles.css";
 import { ActionType } from "../context/Context";
 
-interface Props {
-  todo: string;
-  setTodo: React.Dispatch<React.SetStateAction<string>>;
-  handleAdd: (e: React.FormEvent) => void;
-}
-
-export const InputField = ({ setTodo, handleAdd }: Props) => {
+export const InputField = () => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const { dispatch, todo } = useTodos();
-  console.log(todo);
+  const { dispatch, todo, handleAdd } = useTodos();
 
   return (
     <form

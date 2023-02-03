@@ -5,30 +5,16 @@ import { Todo } from "./components/model";
 import { TodoList } from "./components/TodoList";
 import { useTodos } from "./context/Context";
 
-const App: React.FC = () => {
-  const [todo, setTodo] = useState<string>("");
+const App = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
 
-  const handleAdd = (e: React.FormEvent) => {
-    e.preventDefault();
+  const { todos: todosList } = useTodos();
 
-    if (todo) {
-      setTodos([
-        ...todos,
-        {
-          id: Math.random() * 70,
-          todo: todo,
-          isDone: false,
-        },
-      ]);
-      setTodo("");
-    }
-  };
   return (
     <div className="App">
       <span className="heading">Taskify</span>
-      <InputField todo={todo} setTodo={setTodo} handleAdd={handleAdd} />
-      {todos.length > 0 && <TodoList todos={todos} setTodos={setTodos} />}
+      <InputField />
+      {todosList.length > 0 && <TodoList />}
     </div>
   );
 };

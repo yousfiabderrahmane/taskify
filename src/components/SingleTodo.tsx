@@ -2,67 +2,48 @@ import React, { useState, useRef, useEffect } from "react";
 import { Todo } from "./model";
 import { AiFillEdit, AiFillDelete } from "react-icons/ai";
 import { MdOutlineDownloadDone } from "react-icons/md";
+import { ActionType, useTodos } from "../context/Context";
 
 type Props = {
   todo: Todo;
-  todos: Todo[];
-  setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
 }; //same as interface just wanted to change the flow
 
-export const SingleTodo: React.FC<Props> = ({ todo, todos, setTodos }) => {
+export const SingleTodo: React.FC<Props> = ({ todo }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editTodo, setEditTodo] = useState<string>(todo.todo); //initial name
+
+  const {
+    dispatch,
+    handleAdd,
+    handleDelete,
+    handleDone,
+    handleEdit,
+    editedTodo,
+  } = useTodos();
 
   const editRef = useRef<HTMLInputElement>(null);
 
-  // handle the done proprety function
-  const handleDone = (id: number) => {
-    const newTodos = todos.map((todo) =>
-      todo.id === id ? { ...todo, isDone: !todo.isDone } : todo
-    );
-    setTodos(newTodos);
-  };
-
-  //delete function
-  const handleDelete = (id: number) => {
-    const newTodos = todos.filter((todo) => todo.id !== id);
-    setTodos(newTodos);
-  };
-
-  //handle edit
-  const handleEdit = (e: React.FormEvent, id: number) => {
-    e.preventDefault();
-    const editedTodos = todos.map((todo) => {
-      if (todo.id === id) {
-        return { ...todo, todo: editTodo };
-      } else {
-        return todo;
-      }
-    });
-    setTodos(editedTodos);
-    setIsEditing(false);
-    if (!editTodo) {
-      handleDelete(id);
-    }
-  };
+  console.log("bro i re render wtf");
 
   useEffect(() => {
     editRef.current?.focus();
-  }, [isEditing]);
+  }, []);
 
   return (
     <form
       className="todos__single"
       onSubmit={(e) => {
         handleEdit(e, todo.id);
+        setIsEditing(!isEditing);
       }}
     >
       {isEditing ? (
         <input
           ref={editRef}
-          value={editTodo}
+          value={editedTodo}
           className="todos__single--text"
-          onChange={(e) => setEditTodo(e.target.value)}
+          onChange={(e) =>
+            dispatch({ type: ActionType.EDITED_TODO, payload: e.target.value })
+          }
         />
       ) : todo.isDone ? (
         <s className="todos__single--text">{todo.todo}</s>
@@ -71,10 +52,11 @@ export const SingleTodo: React.FC<Props> = ({ todo, todos, setTodos }) => {
       )}
 
       <div>
-        {!todo.isDone && !isEditing && (
+        {!todo.isDone && (
           <span
             className="icon"
             onClick={() => {
+              dispatch({ type: ActionType.EDITED_TODO, payload: todo.todo });
               setIsEditing(!isEditing);
             }}
           >
@@ -84,16 +66,15 @@ export const SingleTodo: React.FC<Props> = ({ todo, todos, setTodos }) => {
         <span className="icon" onClick={() => handleDelete(todo.id)}>
           <AiFillDelete />
         </span>
-        {!isEditing && (
-          <span
-            className="icon"
-            onClick={() => {
-              handleDone(todo.id);
-            }}
-          >
-            <MdOutlineDownloadDone />
-          </span>
-        )}
+
+        <span
+          className="icon"
+          onClick={() => {
+            handleDone(todo.id);
+          }}
+        >
+          <MdOutlineDownloadDone />
+        </span>
       </div>
     </form>
   );
