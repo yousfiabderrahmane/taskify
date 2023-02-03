@@ -1,4 +1,30 @@
-import { useReducer } from "react";
+import { useReducer, createContext } from "react";
+
+type todoAppContextProviderProps = {
+  children: React.ReactNode;
+};
+
+export const TodoContext = createContext<{
+  state?: any;
+  dispatch?: React.Dispatch<any>;
+  handleAdd: any;
+  handleDelete: any;
+  handleEdit: any;
+  handleDone: any;
+}>({}); //not sure
+
+type contextType = {
+  todo: string; //task
+  todos: Todo[]; //lista dyal les task
+  isEditing: boolean;
+  editedTodo: string;
+  theme: string;
+  dispatch: React.Dispatch<Action>;
+  handleAdd: (e: React.FormEvent<Element>) => void;
+  handleDelete: (id: number) => void;
+  handleEdit: (e: React.FormEvent<Element>, id: number) => void;
+  handleDone: (id: number) => void;
+};
 
 interface Todo {
   id: number;
@@ -12,6 +38,7 @@ const initialState = {
   todos: [],
   isEditing: false,
   editedTodo: "",
+  theme: "dark",
 };
 // state interface
 interface InitialState {
@@ -19,6 +46,7 @@ interface InitialState {
   todos: Todo[]; //lista dyal les task
   isEditing: boolean;
   editedTodo: string;
+  theme: string;
 }
 
 //enum for the action types
@@ -52,7 +80,9 @@ const todoReducer = (state: InitialState, action: Action) => {
   }
 };
 
-export const Context = () => {
+export const Context: React.FC<todoAppContextProviderProps> = ({
+  children,
+}) => {
   const [state, dispatch] = useReducer(todoReducer, initialState);
 
   //handle Add
@@ -110,5 +140,18 @@ export const Context = () => {
     }
   };
 
-  return <div>context</div>;
+  return (
+    <TodoContext.Provider
+      value={{
+        ...state,
+        handleAdd,
+        handleDelete,
+        handleDone,
+        handleEdit,
+        dispatch,
+      }}
+    >
+      {children}
+    </TodoContext.Provider>
+  );
 };
