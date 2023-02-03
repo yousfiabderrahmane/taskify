@@ -3,7 +3,7 @@ import "./App.css";
 import { InputField } from "./components/InputField";
 import { Todo } from "./components/model";
 import { TodoList } from "./components/TodoList";
-import { useToDoContext } from "./context/useToDoContext";
+import { useTodos } from "./context/Context";
 
 const App: React.FC = () => {
   const [todo, setTodo] = useState<string>("");

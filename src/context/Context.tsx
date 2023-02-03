@@ -1,31 +1,6 @@
-import { useReducer, createContext } from "react";
+import { useReducer, createContext, useContext } from "react";
 
-type todoAppContextProviderProps = {
-  children: React.ReactNode;
-};
-
-export const TodoContext = createContext<{
-  state?: any;
-  dispatch?: React.Dispatch<any>;
-  handleAdd: any;
-  handleDelete: any;
-  handleEdit: any;
-  handleDone: any;
-}>({}); //not sure
-
-type contextType = {
-  todo: string; //task
-  todos: Todo[]; //lista dyal les task
-  isEditing: boolean;
-  editedTodo: string;
-  theme: string;
-  dispatch: React.Dispatch<Action>;
-  handleAdd: (e: React.FormEvent<Element>) => void;
-  handleDelete: (id: number) => void;
-  handleEdit: (e: React.FormEvent<Element>, id: number) => void;
-  handleDone: (id: number) => void;
-};
-
+// ------------------------
 interface Todo {
   id: number;
   todo: string;
@@ -38,7 +13,6 @@ const initialState = {
   todos: [],
   isEditing: false,
   editedTodo: "",
-  theme: "dark",
 };
 // state interface
 interface InitialState {
@@ -46,11 +20,10 @@ interface InitialState {
   todos: Todo[]; //lista dyal les task
   isEditing: boolean;
   editedTodo: string;
-  theme: string;
 }
 
 //enum for the action types
-enum ActionType {
+export enum ActionType {
   UPDATE_TODO = "UPDATE_TODO", //the task name state
   UPDATE_LIST = "UPDATE_LIST", //the array
   EDIT = "EDIT", //handle the edit
@@ -80,9 +53,26 @@ const todoReducer = (state: InitialState, action: Action) => {
   }
 };
 
-export const Context: React.FC<todoAppContextProviderProps> = ({
-  children,
-}) => {
+//CONTEXT AAAAAAAAAH!!!!!!
+interface Props {
+  children?: any;
+}
+
+type UseTodosManagerResult = ReturnType<typeof useTodosManager>;
+
+const TodoContext = createContext<UseTodosManagerResult>({
+  handleAdd: () => {},
+  handleDelete: () => {},
+  handleEdit: () => {},
+  handleDone: () => {},
+  dispatch: () => {},
+  todo: "",
+  todos: [],
+  isEditing: false,
+  editedTodo: "",
+});
+
+export const useTodosManager = () => {
   const [state, dispatch] = useReducer(todoReducer, initialState);
 
   //handle Add
@@ -139,19 +129,27 @@ export const Context: React.FC<todoAppContextProviderProps> = ({
       handleDelete(id);
     }
   };
+  return {
+    ...state,
+    handleAdd,
+    handleDelete,
+    handleEdit,
+    handleDone,
+    dispatch,
+  };
+};
 
-  return (
-    <TodoContext.Provider
-      value={{
-        ...state,
-        handleAdd,
-        handleDelete,
-        handleDone,
-        handleEdit,
-        dispatch,
-      }}
-    >
-      {children}
-    </TodoContext.Provider>
-  );
+//Provider
+
+export const TodosProvider: React.FunctionComponent<Props> = ({ children }) => (
+  <TodoContext.Provider value={useTodosManager()}>
+    {children}
+  </TodoContext.Provider>
+);
+
+//custom hook
+
+export const useTodos = (): UseTodosManagerResult => {
+  const ctx = useContext(TodoContext);
+  return ctx;
 };

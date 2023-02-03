@@ -1,13 +1,18 @@
 import React, { useRef } from "react";
+import { useTodos } from "../context/Context";
 import "./styles.css";
+import { ActionType } from "../context/Context";
+
 interface Props {
   todo: string;
   setTodo: React.Dispatch<React.SetStateAction<string>>;
   handleAdd: (e: React.FormEvent) => void;
 }
 
-export const InputField = ({ todo, setTodo, handleAdd }: Props) => {
+export const InputField = ({ setTodo, handleAdd }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const { dispatch, todo } = useTodos();
+  console.log(todo);
 
   return (
     <form
@@ -21,7 +26,7 @@ export const InputField = ({ todo, setTodo, handleAdd }: Props) => {
         ref={inputRef}
         value={todo}
         onChange={(e) => {
-          setTodo(e.target.value);
+          dispatch({ type: ActionType.UPDATE_TODO, payload: e.target.value });
         }}
         type="input"
         placeholder="Enter a task"
